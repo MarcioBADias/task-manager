@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import StyledButton from './style';
+import * as S from './style';
 
 const TaskForm = ({ onTaskAdded }) => {
     const [name, setName] = useState('');
@@ -29,27 +29,29 @@ const TaskForm = ({ onTaskAdded }) => {
 
     return (
         <form onSubmit={handleSubmit}>
-            <input
+            <S.FormContainer>
+            <S.StyledInput
                 type="text"
                 placeholder="Nome da Tarefa"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
             />
-            <input
+            <S.StyledInput
                 type="number"
                 placeholder="Custo (R$)"
                 value={cost}
                 onChange={(e) => setCost(e.target.value)}
                 required
             />
-            <input
+            <S.StyledInput
                 type="date"
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
                 required
             />
-            <StyledButton type="submit">Adicionar Tarefa</StyledButton>
+            </S.FormContainer>
+            <S.StyledButton type="submit">Adicionar Tarefa</S.StyledButton>
         </form>
     );
 };
