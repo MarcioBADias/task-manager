@@ -4,7 +4,9 @@ import {
   RiDeleteBack2Fill,
   RiArrowUpCircleFill,
   RiArrowDownCircleFill,
+  RiCheckboxCircleFill,
 } from 'react-icons/ri'
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
 import * as S from './style'
 
 const TaskList = ({ tasks, setTasks }) => {
@@ -72,9 +74,8 @@ const TaskList = ({ tasks, setTasks }) => {
     }
   }
 
-  // Função para mover o item para cima
   const handleMoveUp = (index) => {
-    if (index === 0) return // Impede o primeiro item de subir mais
+    if (index === 0) return
     const newTasks = [...tasks]
     ;[newTasks[index - 1], newTasks[index]] = [
       newTasks[index],
@@ -83,9 +84,8 @@ const TaskList = ({ tasks, setTasks }) => {
     setTasks(newTasks)
   }
 
-  // Função para mover o item para baixo
   const handleMoveDown = (index) => {
-    if (index === tasks.length - 1) return // Impede o último item de descer mais
+    if (index === tasks.length - 1) return
     const newTasks = [...tasks]
     ;[newTasks[index], newTasks[index + 1]] = [
       newTasks[index + 1],
@@ -94,56 +94,98 @@ const TaskList = ({ tasks, setTasks }) => {
     setTasks(newTasks)
   }
 
+  const handleDragEnd = async (result) => {
+    if (!result.destination) return
+
+    const reorderedTasks = Array.from(tasks)
+    const [removed] = reorderedTasks.splice(result.source.index, 1)
+    reorderedTasks.splice(result.destination.index, 0, removed)
+
+    setTasks(reorderedTasks)
+
+    await fetch('http://localhost:5000/tasks/reorder', {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ tasks: reorderedTasks }),
+    })
+  }
+
   return (
     <S.ListContainer>
       <h2>Lista de Tarefas</h2>
-      <S.List>
-        {tasks.map((task, index) => (
-          <S.ItenList key={task._id} highlight={task.cost > 900}>
-            {editingTask && editingTask._id === task._id ? (
-              <form
-                onSubmit={handleUpdate}
-                style={{ display: 'flex', alignItems: 'center' }}
-              >
-                <S.EditContainer>
-                  <S.ListInput
-                    type="text"
-                    value={editedName}
-                    onChange={(e) => setEditedName(e.target.value)}
-                    required
-                  />
-                  <S.ListInput
-                    type="number"
-                    value={editedCost}
-                    onChange={(e) => setEditedCost(e.target.value)}
-                    required
-                  />
-                  <S.ListInput
-                    type="date"
-                    value={editedDueDate}
-                    onChange={(e) => setEditedDueDate(e.target.value)}
-                    required
-                  />
-                  <button
-                    type="submit"
-                    style={{ background: 'none', border: 'none', padding: 0 }}
-                  >
-                    <S.CheckboxIcon />
-                  </button>
-                </S.EditContainer>
-              </form>
-            ) : (
-              <>
-                <RiEditBoxFill onClick={() => handleEdit(task)} />
-                {task.name} - R$ {task.cost} - {formatDate(task.dueDate)}
-                <RiDeleteBack2Fill onClick={() => handleDelete(task._id)} />
-                <RiArrowUpCircleFill onClick={() => handleMoveUp(index)} />
-                <RiArrowDownCircleFill onClick={() => handleMoveDown(index)} />
-              </>
-            )}
-          </S.ItenList>
-        ))}
-      </S.List>
+      <DragDropContext onDragEnd={handleDragEnd}>
+        <Droppable droppableId="tasks">
+          {(provided) => (
+            <S.List {...provided.droppableProps} ref={provided.innerRef}>
+              {tasks.map((task, index) => (
+                <Draggable key={task._id} draggableId={task._id} index={index}>
+                  {(provided) => (
+                    <S.ItenList
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      {...provided.dragHandleProps}
+                      highlight={task.cost > 900}
+                    >
+                      {editingTask && editingTask._id === task._id ? (
+                        <form onSubmit={handleUpdate}>
+                          <S.EditContainer>
+                            <S.ListInput
+                              type="text"
+                              value={editedName}
+                              onChange={(e) => setEditedName(e.target.value)}
+                              required
+                            />
+                            <S.ListInput
+                              type="number"
+                              value={editedCost}
+                              onChange={(e) => setEditedCost(e.target.value)}
+                              required
+                            />
+                            <S.ListInput
+                              type="date"
+                              value={editedDueDate}
+                              onChange={(e) => setEditedDueDate(e.target.value)}
+                              required
+                            />
+                            <button
+                              type="submit"
+                              style={{
+                                background: 'none',
+                                border: 'none',
+                                padding: 0,
+                              }}
+                            >
+                              <RiCheckboxCircleFill />
+                            </button>
+                          </S.EditContainer>
+                        </form>
+                      ) : (
+                        <>
+                          <RiEditBoxFill onClick={() => handleEdit(task)} />
+                          {task.name} - R$ {task.cost} -{' '}
+                          {formatDate(task.dueDate)}
+                          <RiDeleteBack2Fill
+                            onClick={() => handleDelete(task._id)}
+                          />
+                          <RiArrowUpCircleFill
+                            onClick={() => handleMoveUp(index)}
+                          />
+                          <RiArrowDownCircleFill
+                            onClick={() => handleMoveDown(index)}
+                          />
+                        </>
+                      )}
+                    </S.ItenList>
+                  )}
+                </Draggable>
+              ))}
+              {provided.placeholder}
+            </S.List>
+          )}
+        </Droppable>
+      </DragDropContext>
     </S.ListContainer>
   )
 }
