@@ -26,7 +26,7 @@ app.get('/tasks', async (req, res) => {
     } catch (error) {
       res.status(400).json({ error: error.message })
     }
-  })
+  })  
   
   app.delete('/tasks/:id', async (req, res) => {
     await Task.findByIdAndDelete(req.params.id)
@@ -43,4 +43,20 @@ app.get('/tasks', async (req, res) => {
     res.json(task)
   })
 
+  app.patch('/tasks/reorder', async (req, res) => {
+    const { tasks } = req.body
+    const bulkOperations = tasks.map(task => ({
+      updateOne: {
+        filter: { _id: task._id },
+        update: { order: task.order },
+      },
+    }))
+    try {
+      await Task.bulkWrite(bulkOperations)
+      res.status(200).send("Order updated successfully")
+    } catch (error) {
+      res.status(500).send("Error updating order")
+    }
+  })
+  
 app.listen(5000, () => console.log('Server conectado na porta 5000'))
