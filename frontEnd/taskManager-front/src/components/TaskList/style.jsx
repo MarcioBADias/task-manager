@@ -1,4 +1,5 @@
 import styled from 'styled-components'
+import { RiCheckboxCircleFill } from 'react-icons/ri'
 
 export const ListContainer = styled.div`
   background-color: #4caf50;
@@ -33,6 +34,23 @@ export const ItenList = styled.li`
   }
 
   svg:hover {
-    transform: scale(1.1);
+    border: none;
+    transform: scale(1.5);
   }
+`
+export const EditContainer = styled.div`
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+`
+
+export const ListInput = styled.input`
+  padding: 0.5rem;
+  margin: 0.5rem;
+`
+
+export const CheckboxIcon = styled(RiCheckboxCircleFill)`
+  width: 35px;
+  height: 35px;
+  cursor: pointer;
 `
