@@ -72,11 +72,33 @@ const TaskList = ({ tasks, setTasks }) => {
     }
   }
 
+  // Função para mover o item para cima
+  const handleMoveUp = (index) => {
+    if (index === 0) return // Impede o primeiro item de subir mais
+    const newTasks = [...tasks]
+    ;[newTasks[index - 1], newTasks[index]] = [
+      newTasks[index],
+      newTasks[index - 1],
+    ]
+    setTasks(newTasks)
+  }
+
+  // Função para mover o item para baixo
+  const handleMoveDown = (index) => {
+    if (index === tasks.length - 1) return // Impede o último item de descer mais
+    const newTasks = [...tasks]
+    ;[newTasks[index], newTasks[index + 1]] = [
+      newTasks[index + 1],
+      newTasks[index],
+    ]
+    setTasks(newTasks)
+  }
+
   return (
     <S.ListContainer>
       <h2>Lista de Tarefas</h2>
       <S.List>
-        {tasks.map((task) => (
+        {tasks.map((task, index) => (
           <S.ItenList key={task._id} highlight={task.cost > 900}>
             {editingTask && editingTask._id === task._id ? (
               <form
@@ -104,14 +126,9 @@ const TaskList = ({ tasks, setTasks }) => {
                   />
                   <button
                     type="submit"
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      color: '#fff',
-                      padding: 0,
-                    }}
+                    style={{ background: 'none', border: 'none', padding: 0 }}
                   >
-                    <S.CheckboxIcon type="submit" />
+                    <S.CheckboxIcon />
                   </button>
                 </S.EditContainer>
               </form>
@@ -120,8 +137,8 @@ const TaskList = ({ tasks, setTasks }) => {
                 <RiEditBoxFill onClick={() => handleEdit(task)} />
                 {task.name} - R$ {task.cost} - {formatDate(task.dueDate)}
                 <RiDeleteBack2Fill onClick={() => handleDelete(task._id)} />
-                <RiArrowUpCircleFill />
-                <RiArrowDownCircleFill />
+                <RiArrowUpCircleFill onClick={() => handleMoveUp(index)} />
+                <RiArrowDownCircleFill onClick={() => handleMoveDown(index)} />
               </>
             )}
           </S.ItenList>
