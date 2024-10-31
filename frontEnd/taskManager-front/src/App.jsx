@@ -1,23 +1,33 @@
-import React, { useState } from 'react'
-import TaskList from './components/TaskList'
+import React, { useEffect, useState } from 'react'
 import TaskForm from './components/TaskForm'
-import { Global } from './globalStyles'
+import { TaskList } from './components/TaskList'
+import { GlobalStyles } from './globalStyles'
 
 const App = () => {
-    const [tasks, setTasks] = useState([])
+  const [tasks, setTasks] = useState([])
 
-    const handleTaskAdded = (newTask) => {
-        setTasks([...tasks, newTask])
-    }
+  const fetchTasks = async () => {
+    const response = await fetch('http://localhost:5000/tasks')
+    const data = await response.json()
+    setTasks(data)
+  }
 
-    return (
-        <div style={{}}>
-            <h1>Gerenciador de Tarefas</h1>
-            <TaskForm onTaskAdded={handleTaskAdded} />
-            <TaskList tasks={tasks} />
-            <Global />
-        </div>
-    )
+  useEffect(() => {
+    fetchTasks()
+  }, [])
+
+  const handleTaskAdded = (newTask) => {
+    setTasks((prevTasks) => [...prevTasks, newTask])
+  }
+
+  return (
+    <div>
+      <h1>Gerenciador de Tarefas</h1>
+      <TaskForm onTaskAdded={handleTaskAdded} />
+      <TaskList tasks={tasks} setTasks={setTasks} />
+      <GlobalStyles />
+    </div>
+  )
 }
 
-export default App
+export { App }

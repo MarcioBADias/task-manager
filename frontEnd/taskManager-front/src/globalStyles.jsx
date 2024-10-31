@@ -1,6 +1,6 @@
 import { createGlobalStyle } from 'styled-components'
 
-const Global = createGlobalStyle`
+const GlobalStyles = createGlobalStyle`
 
     *{
         margin: 0;
@@ -14,6 +14,6 @@ const Global = createGlobalStyle`
         font-family: 'poppins', Sans-Serif;
         text-align: center;
     }
-`;
+`
 
-export { Global }
+export { GlobalStyles }
