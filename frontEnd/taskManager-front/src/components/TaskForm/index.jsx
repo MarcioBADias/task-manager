@@ -4,11 +4,11 @@ import * as S from './style'
 const TaskForm = ({ onTaskAdded }) => {
   const [name, setName] = useState('')
   const [cost, setCost] = useState('')
-  const [dueDate, setDueDate] = useState('')
+  const [deadline, setDeadline] = useState('')
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    const newTask = { name, cost, dueDate }
+    const newTask = { name, cost: Number(cost), deadline }
 
     const response = await fetch('http://localhost:5000/tasks', {
       method: 'POST',
@@ -18,12 +18,16 @@ const TaskForm = ({ onTaskAdded }) => {
       body: JSON.stringify(newTask),
     })
 
-    const addedTask = await response.json()
-    onTaskAdded(addedTask)
+    if (response.ok) {
+      const addedTask = await response.json()
+      onTaskAdded(addedTask)
 
-    setName('')
-    setCost('')
-    setDueDate('')
+      setName('')
+      setCost('')
+      setDeadline('')
+    } else {
+      console.error('Erro ao adicionar tarefa')
+    }
   }
 
   return (
@@ -45,8 +49,8 @@ const TaskForm = ({ onTaskAdded }) => {
         />
         <S.StyledInput
           type="date"
-          value={dueDate}
-          onChange={(e) => setDueDate(e.target.value)}
+          value={deadline}
+          onChange={(e) => setDeadline(e.target.value)}
           required
         />
       </S.FormContainer>

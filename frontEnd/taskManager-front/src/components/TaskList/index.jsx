@@ -13,10 +13,13 @@ const TaskList = ({ tasks, setTasks }) => {
   const [editingTask, setEditingTask] = useState(null)
   const [editedName, setEditedName] = useState('')
   const [editedCost, setEditedCost] = useState('')
-  const [editedDueDate, setEditedDueDate] = useState('')
+  const [editedDeadline, setEditedDeadline] = useState('')
 
   const formatDate = (date) => {
-    return new Date(date).toLocaleDateString('pt-BR')
+    const dateObj = new Date(date)
+    return !isNaN(dateObj.getTime())
+      ? dateObj.toLocaleDateString('pt-BR')
+      : 'Data inválida'
   }
 
   const handleDelete = async (taskId) => {
@@ -34,7 +37,9 @@ const TaskList = ({ tasks, setTasks }) => {
     setEditingTask(task)
     setEditedName(task.name)
     setEditedCost(task.cost)
-    setEditedDueDate(task.dueDate)
+    setEditedDeadline(
+      task.deadline ? new Date(task.deadline).toISOString().slice(0, 10) : '',
+    )
   }
 
   const handleUpdate = async (e) => {
@@ -43,7 +48,7 @@ const TaskList = ({ tasks, setTasks }) => {
       ...editingTask,
       name: editedName,
       cost: Number(editedCost),
-      dueDate: editedDueDate,
+      deadline: new Date(editedDeadline).toISOString(),
     }
 
     try {
@@ -145,8 +150,10 @@ const TaskList = ({ tasks, setTasks }) => {
                             />
                             <S.ListInput
                               type="date"
-                              value={editedDueDate}
-                              onChange={(e) => setEditedDueDate(e.target.value)}
+                              value={editedDeadline}
+                              onChange={(e) =>
+                                setEditedDeadline(e.target.value)
+                              }
                               required
                             />
                             <button
@@ -165,7 +172,7 @@ const TaskList = ({ tasks, setTasks }) => {
                         <>
                           <RiEditBoxFill onClick={() => handleEdit(task)} />
                           {task.name} - R$ {task.cost} -{' '}
-                          {formatDate(task.dueDate)}
+                          {formatDate(task.deadline)}
                           <RiDeleteBack2Fill
                             onClick={() => handleDelete(task._id)}
                           />
