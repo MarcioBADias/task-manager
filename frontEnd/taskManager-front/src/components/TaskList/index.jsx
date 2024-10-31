@@ -28,7 +28,7 @@ const TaskList = ({ tasks, setTasks }) => {
       <h2>Lista de Tarefas</h2>
       <S.List>
         {tasks.map((task) => (
-          <S.ItenList key={task._id}>
+          <S.ItenList key={task._id} highlight={task.cost > 900}>
             <RiEditBoxFill />
             {task.name} - R$ {task.cost} - {formatDate(task.dueDate)}
             <RiDeleteBack2Fill onClick={() => handleDelete(task._id)} />

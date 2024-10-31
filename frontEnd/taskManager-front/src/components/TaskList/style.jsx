@@ -6,11 +6,17 @@ export const ListContainer = styled.div`
   margin-top: 1rem;
   padding: 1rem;
 `
+
 export const List = styled.ul`
   list-style: none;
   margin: 0;
   padding: 0;
+
+  :hover {
+    border: 3px solid #fff;
+  }
 `
+
 export const ItenList = styled.li`
   display: flex;
   align-items: center;
@@ -18,6 +24,8 @@ export const ItenList = styled.li`
   padding: 0.5rem;
   border-radius: 5px;
   margin-top: 0.5rem;
+  background-color: ${({ highlight }) =>
+    highlight ? 'rgba(255, 0, 0, 0.84)' : 'transparent'};
 
   svg {
     cursor: pointer;
