@@ -54,3 +54,11 @@ export const CheckboxIcon = styled(RiCheckboxCircleFill)`
   height: 35px;
   cursor: pointer;
 `
+export const Popup = styled.div`
+  color: red;
+  background-color: #f9e6e6;
+  padding: 10px;
+  border: 1px solid red;
+  margin-top: 10px;
+  text-align: center;
+`

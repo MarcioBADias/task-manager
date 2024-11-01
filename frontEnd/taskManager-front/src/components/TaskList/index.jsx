@@ -14,6 +14,7 @@ const TaskList = ({ tasks, setTasks }) => {
   const [editedName, setEditedName] = useState('')
   const [editedCost, setEditedCost] = useState('')
   const [editedDeadline, setEditedDeadline] = useState('')
+  const [errorPopup, setErrorPopup] = useState('')
 
   const formatDate = (date) => {
     const dateObj = new Date(date)
@@ -63,17 +64,20 @@ const TaskList = ({ tasks, setTasks }) => {
         },
       )
 
-      if (response.ok) {
-        const taskData = await response.json()
-        setTasks((prevTasks) =>
-          prevTasks.map((task) =>
-            task._id === taskData._id ? taskData : task,
-          ),
-        )
-        setEditingTask(null)
-      } else {
-        console.error('Erro ao atualizar a tarefa')
+      if (response.status === 400) {
+        const errorData = await response.json()
+        if (errorData.error === 'Task name already exists') {
+          setErrorPopup('O item já está cadastrado na lista de tarefas')
+          return
+        }
       }
+
+      const taskData = await response.json()
+      setTasks((prevTasks) =>
+        prevTasks.map((task) => (task._id === taskData._id ? taskData : task)),
+      )
+      setEditingTask(null)
+      setErrorPopup('') // Limpar mensagem de erro ao sucesso
     } catch (error) {
       console.error('Erro ao atualizar a tarefa:', error)
     }
@@ -120,6 +124,7 @@ const TaskList = ({ tasks, setTasks }) => {
   return (
     <S.ListContainer>
       <h2>Lista de Tarefas</h2>
+      {errorPopup && <S.Popup>{errorPopup}</S.Popup>} {/* Exibição do Popup */}
       <DragDropContext onDragEnd={handleDragEnd}>
         <Droppable droppableId="tasks">
           {(provided) => (
