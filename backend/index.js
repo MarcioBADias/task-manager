@@ -19,28 +19,50 @@ app.get('/tasks', async (req, res) => {
   
   app.post('/tasks', async (req, res) => {
     try {
+      const { name, cost, deadline } = req.body
+      const nameLower = name.toLowerCase() 
+      
+      const existingTask = await Task.findOne({ searchName: nameLower })
+      
+      if (existingTask) {
+        return res.status(400).json({ error: `O item "${name}" já está cadastrado na lista.` })
+      }
+      
       const order = (await Task.countDocuments()) + 1
-      const task = new Task({ ...req.body, order })
+      const task = new Task({
+        name, 
+        searchName: nameLower,
+        cost,
+        deadline,
+        order,
+      })
+      
       await task.save()
       res.status(201).json(task)
     } catch (error) {
       res.status(400).json({ error: error.message })
     }
-  })  
+  })
+  
+  app.put('/tasks/:id', async (req, res) => {
+    const nameLower = req.body.name.toLowerCase()
+  
+    const existingTask = await Task.findOne({
+      name: nameLower,
+      _id: { $ne: req.params.id },
+    })
+  
+    if (existingTask) {
+      return res.status(400).json({ error: 'Task name already exists' })
+    }
+  
+    const updatedTask = await Task.findByIdAndUpdate(req.params.id, { ...req.body, name: req.body.name }, { new: true })
+    res.json(updatedTask)
+  })
   
   app.delete('/tasks/:id', async (req, res) => {
     await Task.findByIdAndDelete(req.params.id)
     res.status(204).send()
-  })
-  
-  app.put('/tasks/:id', async (req, res) => {
-    const { name } = req.body
-    const existingTask = await Task.findOne({ name })
-    if (existingTask && existingTask._id.toString() !== req.params.id) {
-      return res.status(400).json({ error: 'Task name already exists' })
-    }
-    const task = await Task.findByIdAndUpdate(req.params.id, req.body, { new: true })
-    res.json(task)
   })
 
   app.patch('/tasks/reorder', async (req, res) => {
