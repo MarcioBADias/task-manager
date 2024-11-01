@@ -11,13 +11,16 @@ const TaskForm = ({ onTaskAdded }) => {
     e.preventDefault()
     const newTask = { name, cost, deadline }
 
-    const response = await fetch('http://localhost:5000/tasks', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
+    const response = await fetch(
+      'https://taskmanager-backend-vh5d.onrender.com/tasks',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newTask),
       },
-      body: JSON.stringify(newTask),
-    })
+    )
 
     if (response.ok) {
       const addedTask = await response.json()

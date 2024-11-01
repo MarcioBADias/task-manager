@@ -25,7 +25,7 @@ const TaskList = ({ tasks, setTasks }) => {
 
   const handleDelete = async (taskId) => {
     try {
-      await fetch(`http://localhost:5000/tasks/${taskId}`, {
+      await fetch(`https://taskmanager-backend-vh5d.onrender.com/tasks/${taskId}`, {
         method: 'DELETE',
       })
       setTasks(tasks.filter((task) => task._id !== taskId))
@@ -54,7 +54,7 @@ const TaskList = ({ tasks, setTasks }) => {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/tasks/${editingTask._id}`,
+        `https://taskmanager-backend-vh5d.onrender.com/tasks/${editingTask._id}`,
         {
           method: 'PUT',
           headers: {
@@ -112,7 +112,7 @@ const TaskList = ({ tasks, setTasks }) => {
 
     setTasks(reorderedTasks)
 
-    await fetch('http://localhost:5000/tasks/reorder', {
+    await fetch('https://taskmanager-backend-vh5d.onrender.com/tasks/reorder', {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
